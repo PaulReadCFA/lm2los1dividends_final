@@ -338,14 +338,15 @@ body {
 
 .input-field-inline.error,
 .input-field-inline[aria-invalid="true"] {
-  border-color: var(--color-red-300);
+  border-color: var(--color-red-500);
+  border-width: 2px;
   background-color: var(--color-red-50);
 }
 
 .input-field-inline.error:focus,
 .input-field-inline[aria-invalid="true"]:focus {
-  border-color: var(--color-red-500);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: var(--color-red-700);
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.2);
 }
 
 /* Prefix & Suffix ($, %) */
@@ -776,17 +777,28 @@ body {
 
 .validation-summary {
   margin-top: 0.75rem;
-  padding: 0.75rem;
+  padding: 1rem;
   background-color: var(--color-red-50);
-  border: 1px solid var(--color-red-200);
+  border: 2px solid var(--color-red-500);
+  border-left: 4px solid var(--color-red-700);
   border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(185, 28, 28, 0.1);
 }
 
 .validation-title {
   color: var(--color-red-800);
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin-bottom: 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.validation-title::before {
+  content: "⚠";
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .validation-summary ul {
@@ -798,14 +810,39 @@ body {
 .validation-summary li {
   color: var(--color-red-800);
   font-size: 0.875rem;
-  padding-left: 1rem;
+  padding-left: 1.5rem;
   position: relative;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.validation-summary li:last-child {
+  margin-bottom: 0;
 }
 
 .validation-summary li::before {
-  content: "â€¢";
+  content: "•";
   position: absolute;
-  left: 0;
+  left: 0.5rem;
+  font-weight: bold;
+  color: var(--color-red-700);
+}
+
+.validation-summary a {
+  color: var(--color-red-800);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.validation-summary a:hover {
+  color: var(--color-red-700);
+  text-decoration: none;
+}
+
+.validation-summary a:focus {
+  outline: 2px solid var(--color-red-700);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ==========================================================================

@@ -1,5 +1,5 @@
 /**
- * validation.js – Clean, cross-field aware validation
+ * validation.js â€“ Clean, cross-field aware validation
  * Matches the pattern used in other calculators
  */
 import { $ } from './utils.js';
@@ -78,8 +78,31 @@ export function validateAll(inputs) {
 export function updateFieldError(fieldId, msg) {
   const el = $(`#${fieldId}`);
   if (!el) return;
-  el.classList.toggle('error', !!msg);
-  el.toggleAttribute('aria-invalid', !!msg);
+  
+  const hasError = !!msg;
+  el.classList.toggle('error', hasError);
+  el.toggleAttribute('aria-invalid', hasError);
+  
+  // Add/remove aria-describedby for error message
+  if (hasError) {
+    const errorId = `${fieldId}-error`;
+    el.setAttribute('aria-describedby', errorId);
+    
+    // Create or update error message element
+    let errorEl = document.getElementById(errorId);
+    if (!errorEl) {
+      errorEl = document.createElement('span');
+      errorEl.id = errorId;
+      errorEl.className = 'sr-only';
+      errorEl.setAttribute('role', 'alert');
+      el.parentElement.appendChild(errorEl);
+    }
+    errorEl.textContent = msg;
+  } else {
+    el.removeAttribute('aria-describedby');
+    const errorEl = document.getElementById(`${fieldId}-error`);
+    if (errorEl) errorEl.remove();
+  }
 }
 
 /* ---------- 5. SUMMARY ---------- */
@@ -112,12 +135,29 @@ export function updateValidationSummary(errors) {
       .join('');
     sum.style.display = 'block';
     announceSummary(cnt);
+    
+    // Scroll validation summary into view
+    sum.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else {
     sum.style.display = 'none';
   }
 }
 
-/* ---------- 6. HAS ERRORS ---------- */
+/* ---------- 6. FOCUS FIRST ERROR ---------- */
+export function focusFirstError(errors) {
+  const firstErrorField = Object.keys(errors)[0];
+  if (firstErrorField) {
+    const el = $(`#${firstErrorField}`);
+    if (el) {
+      setTimeout(() => {
+        el.focus();
+        el.select(); // Select the invalid value for easy correction
+      }, 100);
+    }
+  }
+}
+
+/* ---------- 7. HAS ERRORS ---------- */
 export function hasErrors(e) {
   return Object.keys(e).length > 0;
 }
