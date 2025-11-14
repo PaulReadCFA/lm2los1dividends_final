@@ -1,5 +1,5 @@
 /**
- * calculator.js – Input handling + validation wiring
+ * calculator.js â€“ Dividend Discount Model Calculator
  */
 import { state, setState, subscribe } from './modules/state.js';
 import { calculateAllModels } from './modules/calculations.js';
@@ -16,41 +16,59 @@ import {
 
 /* ---------- INITIALIZATION ---------- */
 function init() {
+  // Check narrow screen FIRST before setting up anything else
+  const initialNarrowCheck = window.innerWidth <= 480;
+  if (initialNarrowCheck) {
+    document.body.classList.add('force-table');
+    setState({ view: 'table' });
+  }
+  
   setupInputs();
   setupModelSelector();
   setupViewToggle();
   subscribe(updateAll);
+  updateCalculations();
+  
+  // Run narrow detection after initial setup
   detectNarrowScreen();
   window.addEventListener('resize', debounce(detectNarrowScreen, 200));
 
-  // Initial calculation with default values
-  updateCalculations();
-
-  // Skip to data table: activate table, update UI, focus button
-  document.getElementById('skip-to-table')?.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    // 1. Switch to table view
-    setState({ view: 'table' });
-
-    // 2. Wait for state to update, then sync button state and focus
-    setTimeout(() => {
-      updateButtonStates(); // ← Ensures "Table" button is highlighted & aria-pressed="true"
-
-      const btn = $('#view-table-btn');
-      if (btn) {
-        btn.focus();
-        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Skip to table
+  const skipToTableLink = document.getElementById('skip-to-table');
+  if (skipToTableLink) {
+    skipToTableLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Switch to table view
+      switchView('table');
+      // Focus the table button so user knows they activated it
+      const tableBtn = $('#view-table-btn');
+      if (tableBtn) {
+        setTimeout(() => {
+          tableBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          tableBtn.focus();
+        }, 100);
       }
-    }, 50); // Small delay ensures state is applied
-  });
+    });
+  }
 }
 
-/* ==== calculator.js – replace setupInputs() ==== */
-function setupInputs() {
-  const allFields = ['D0', 'required', 'gConst', 'gShort', 'gLong', 'shortYears'];
+function switchView(view) {
+  const isForced = document.body.classList.contains('force-table');
+  
+  // If forced to table, ignore chart requests
+  if (isForced && view === 'chart') {
+    return;
+  }
 
-  allFields.forEach(id => {
+  // Update state
+  setState({ view });
+}
+
+/* ---------- INPUTS ---------- */
+function setupInputs() {
+  const fields = ['D0', 'required', 'gConst', 'gShort', 'gLong', 'shortYears'];
+
+  fields.forEach(id => {
     const el = $(`#${id}`);
     if (!el) return;
 
@@ -64,22 +82,18 @@ function setupInputs() {
       // Run full validation
       const errors = validateAll(candidate);
 
-      // Update UI for ALL fields
-      allFields.forEach(f => {
-        const input = $(`#${f}`);
-        if (input) {
-          input.classList.toggle('error', !!errors[f]);
-          input.toggleAttribute('aria-invalid', !!errors[f]);
-        }
+      // Update error UI for ALL fields
+      fields.forEach(f => {
+        updateFieldError(f, errors[f]);
       });
 
-      // Update summary
+      // Update validation summary
       updateValidationSummary(errors);
 
-      // Always save current inputs (even if invalid)
+      // ALWAYS save inputs and errors
       setState({ inputs: candidate, errors });
 
-      // Only calculate if fully valid
+      // Only calculate if no errors
       if (!hasErrors(errors)) {
         updateCalculations();
       }
@@ -123,143 +137,151 @@ function setupModelSelector() {
     { id: 'model-growth-btn', model: 'growth' },
     { id: 'model-changing-btn', model: 'changing' }
   ];
-  
+
   modelButtons.forEach(({ id, model }) => {
     const btn = $(`#${id}`);
     if (!btn) return;
-    
     listen(btn, 'click', () => selectModel(model));
-    
-    // Arrow key navigation between model buttons
-    btn.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const currentIndex = modelButtons.findIndex(b => b.id === id);
-        const direction = e.key === 'ArrowRight' ? 1 : -1;
-        const nextIndex = (currentIndex + direction + modelButtons.length) % modelButtons.length;
-        const nextBtn = $(`#${modelButtons[nextIndex].id}`);
-        if (nextBtn) {
-          nextBtn.focus();
-          selectModel(modelButtons[nextIndex].model);
-        }
-      }
-    });
   });
 }
 
 function selectModel(model) {
-  // Update button states
-  const allButtons = document.querySelectorAll('.model-btn');
-  allButtons.forEach(btn => {
-    const btnModel = btn.getAttribute('data-model');
-    if (btnModel === model) {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else {
-      btn.classList.remove('active');
-      btn.setAttribute('aria-pressed', 'false');
-    }
+  document.querySelectorAll('.model-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.model === model);
+    btn.setAttribute('aria-pressed', btn.dataset.model === model);
   });
-  
-  // Update state
   setState({ selectedModel: model });
-  
-  // Announce change
-  const modelNames = {
-    'all': 'All models',
-    'constant': 'Constant dividend model',
-    'growth': 'Constant growth model',
-    'changing': 'Two-stage model'
-  };
-  announceToScreenReader(`${modelNames[model]} selected`);
 }
 
-/* ---------- VIEW TOGGLE WITH ARROW KEYS ---------- */
+/* ---------- VIEW TOGGLE ---------- */
 function setupViewToggle() {
   const chartBtn = $('#view-chart-btn');
   const tableBtn = $('#view-table-btn');
 
+  listen(chartBtn, 'click', () => switchView('chart'));
+  listen(tableBtn, 'click', () => switchView('table'));
+
   updateButtonStates();
-
-  listen(chartBtn, 'click', () => { setState({ view: 'chart' }); updateButtonStates(); });
-  listen(tableBtn, 'click', () => { setState({ view: 'table' }); updateButtonStates(); });
-
-  [chartBtn, tableBtn].forEach(btn => {
-    btn.tabIndex = 0;
-    btn.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const next = btn === chartBtn ? tableBtn : chartBtn;
-        next.focus();
-        setState({ view: next.id === 'view-chart-btn' ? 'chart' : 'table' });
-        updateButtonStates();
-      }
-    });
-  });
-
-  (state.view === 'chart' ? chartBtn : tableBtn).focus();
 }
 
-/* ---------- BUTTON STATE ---------- */
 function updateButtonStates() {
   const chartBtn = $('#view-chart-btn');
   const tableBtn = $('#view-table-btn');
-  const isTable = state.view === 'table' || document.body.classList.contains('force-table');
+  const isForced = document.body.classList.contains('force-table');
+  const currentView = isForced ? 'table' : state.view;
 
-  chartBtn.classList.toggle('active', !isTable);
-  tableBtn.classList.toggle('active', isTable);
-  chartBtn.setAttribute('aria-pressed', !isTable);
-  tableBtn.setAttribute('aria-pressed', isTable);
-  chartBtn.disabled = document.body.classList.contains('force-table');
+  if (!chartBtn || !tableBtn) return;
+
+  // Update active states
+  chartBtn.classList.toggle('active', currentView === 'chart');
+  tableBtn.classList.toggle('active', currentView === 'table');
+  
+  // Update aria-pressed
+  chartBtn.setAttribute('aria-pressed', currentView === 'chart');
+  tableBtn.setAttribute('aria-pressed', currentView === 'table');
+  
+  // Disable chart button when forced to table
+  chartBtn.disabled = isForced;
 }
 
-/* ---------- NARROW SCREEN (force table) ---------- */
+/* ---------- NARROW SCREEN ---------- */
 function detectNarrowScreen() {
-  const narrow = window.innerWidth <= 480;
-  if (narrow) {
-    document.body.classList.add('force-table');
-    if (state.view !== 'table') setState({ view: 'table' });
-  } else {
-    document.body.classList.remove('force-table');
+  const isNarrow = window.innerWidth <= 480;
+  const body = document.body;
+  const chartContainer = $('#chart-container');
+  const tableContainer = $('#table-container');
+  const wasForced = body.classList.contains('force-table');
+
+  if (isNarrow) {
+    // Force table view
+    body.classList.add('force-table');
+    
+    // Destroy chart immediately if it exists
+    destroyChart();
+    
+    // Set state to table
+    setState({ view: 'table' });
+    
+    // Update DOM immediately - don't wait for state update
+    if (chartContainer) {
+      chartContainer.style.display = 'none';
+    }
+    if (tableContainer) {
+      tableContainer.style.display = 'block';
+    }
+    
+    // If we have calculations, render the table NOW
+    if (state.calculations) {
+      renderTable(state.calculations, state.selectedModel);
+    }
+    
+    // Update button states
+    updateButtonStates();
+    
+  } else if (wasForced) {
+    // Was narrow, now wide - remove force
+    body.classList.remove('force-table');
+    
+    // Restore to user's preferred view (or default to chart)
+    const preferredView = state.view === 'table' ? 'table' : 'chart';
+    setState({ view: preferredView });
+    
+    // Update DOM based on preferred view
+    if (preferredView === 'chart') {
+      if (chartContainer) chartContainer.style.display = 'block';
+      if (tableContainer) tableContainer.style.display = 'none';
+      if (state.calculations) {
+        renderChart(state.calculations, state.selectedModel);
+      }
+    } else {
+      if (chartContainer) chartContainer.style.display = 'none';
+      if (tableContainer) tableContainer.style.display = 'block';
+      if (state.calculations) {
+        renderTable(state.calculations, state.selectedModel);
+      }
+    }
+    
+    // Update button states
+    updateButtonStates();
   }
-  updateButtonStates();
 }
 
 /* ---------- UPDATE ALL ---------- */
 function updateAll(s) {
   if (!s.calculations) return;
-  
-  renderResults(s.calculations, s.selectedModel);
-  renderTable(s.calculations, s.selectedModel);
 
-  if (s.view === 'chart' && !document.body.classList.contains('force-table')) {
-    $('#chart-container').style.display = 'block';
-    $('#table-container').style.display = 'none';
+  renderResults(s.calculations, s.selectedModel);
+  
+  const isForced = document.body.classList.contains('force-table');
+  const actualView = isForced ? 'table' : s.view;
+
+  const chartContainer = $('#chart-container');
+  const tableContainer = $('#table-container');
+  
+  if (!chartContainer || !tableContainer) return;
+
+  // Always render table first (needed for forced and optional table view)
+  renderTable(s.calculations, s.selectedModel);
+  
+  // Show/hide containers based on actual view
+  if (actualView === 'chart' && !isForced) {
+    chartContainer.style.display = 'block';
+    tableContainer.style.display = 'none';
     renderChart(s.calculations, s.selectedModel);
   } else {
-    $('#chart-container').style.display = 'none';
-    $('#table-container').style.display = 'block';
-    destroyChart();
-  }
-}
-
-/* ---------- SCREEN READER ANNOUNCEMENTS ---------- */
-function announceToScreenReader(message) {
-  let region = $('#result-announcement');
-  if (!region) {
-    region = document.createElement('div');
-    region.id = 'result-announcement';
-    region.className = 'sr-only';
-    region.setAttribute('aria-live', 'polite');
-    region.setAttribute('aria-atomic', 'true');
-    document.body.appendChild(region);
+    // Table view or forced table
+    chartContainer.style.display = 'none';
+    tableContainer.style.display = 'block';
+    destroyChart(); // Ensure chart is destroyed
   }
   
-  region.textContent = message;
-  setTimeout(() => region.textContent = '', 1000);
+  // Update button states
+  updateButtonStates();
 }
 
 /* ---------- START ---------- */
-document.readyState === 'loading'
-  ? document.addEventListener('DOMContentLoaded', init)
-  : init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
