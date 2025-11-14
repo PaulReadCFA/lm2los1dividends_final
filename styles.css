@@ -480,12 +480,24 @@ body {
 
 .model-equations-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 @media (min-width: 768px) {
-  .model-equations-grid { grid-template-columns: repeat(3, 1fr); }
+  .model-equations-grid { 
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
+@media (max-width: 767px) {
+  .model-equations-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .formula-box {
+    min-height: auto;
+  }
 }
 
 .formula-box {
@@ -493,6 +505,10 @@ body {
   padding: 0.75rem 1rem;
   background: #f8fafc;
   border-radius: 0 0.5rem 0.5rem 0;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .formula-box-title {
@@ -500,6 +516,7 @@ body {
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
   text-align: center;
+  line-height: 1.3;
 }
 
 .equation-container {
@@ -509,6 +526,25 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0.5rem;
+  word-break: break-word;
+  hyphens: none;
+}
+
+.equation-container mtext {
+  font-size: 0.9em;
+  word-spacing: -0.05em;
+}
+
+@media (max-width: 640px) {
+  .equation-container {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .equation-container {
+    font-size: 1rem;
+  }
 }
 
 .equation-container:focus {
