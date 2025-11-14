@@ -1,6 +1,5 @@
 /**
- * calculator.js – Dividend Discount Model Calculator
- * Adapted to simple calculator template structure with full accessibility
+ * calculator.js – Input handling + validation wiring
  */
 import { state, setState, subscribe } from './modules/state.js';
 import { calculateAllModels } from './modules/calculations.js';
@@ -8,7 +7,12 @@ import { renderResults } from './modules/results.js';
 import { renderChart, destroyChart } from './modules/chart.js';
 import { renderTable } from './modules/table.js';
 import { $, listen, debounce } from './modules/utils.js';
-import { validateField, hasErrors, updateFieldError, updateValidationSummary } from './modules/validation.js';
+import {
+  validateAll,
+  updateFieldError,
+  updateValidationSummary,
+  hasErrors,
+} from './modules/validation.js';
 
 /* ---------- INITIALIZATION ---------- */
 function init() {
@@ -18,78 +22,95 @@ function init() {
   subscribe(updateAll);
   detectNarrowScreen();
   window.addEventListener('resize', debounce(detectNarrowScreen, 200));
-  
-  // Trigger initial calculation with default values
+
+  // Initial calculation with default values
   updateCalculations();
+
+  // Skip to data table: activate table, update UI, focus button
+  document.getElementById('skip-to-table')?.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // 1. Switch to table view
+    setState({ view: 'table' });
+
+    // 2. Wait for state to update, then sync button state and focus
+    setTimeout(() => {
+      updateButtonStates(); // ← Ensures "Table" button is highlighted & aria-pressed="true"
+
+      const btn = $('#view-table-btn');
+      if (btn) {
+        btn.focus();
+        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 50); // Small delay ensures state is applied
+  });
 }
 
-/* ---------- INPUTS ---------- */
+/* ==== calculator.js – replace setupInputs() ==== */
 function setupInputs() {
-  const inputFields = ['D0', 'required', 'gConst', 'gShort', 'gLong', 'shortYears'];
-  
-  inputFields.forEach(id => {
+  const allFields = ['D0', 'required', 'gConst', 'gShort', 'gLong', 'shortYears'];
+
+  allFields.forEach(id => {
     const el = $(`#${id}`);
     if (!el) return;
-    
-    const update = debounce(() => {
-      const val = Number(el.value) || 0;
-      
-      // Validate field
-      const error = validateField(id, val, state.inputs);
-      updateFieldError(id, error);
-      
-      // Update state
-      const errors = { ...state.errors };
-      if (error) {
-        errors[id] = error;
-      } else {
-        delete errors[id];
-      }
-      
-      const newInputs = { ...state.inputs, [id]: val };
-      setState({ inputs: newInputs, errors });
-      
-      // Update validation summary
+
+    const handler = debounce(() => {
+      const raw = el.value.trim();
+      const val = raw === '' ? NaN : Number(raw);
+
+      // Always update inputs with current (possibly invalid) value
+      const candidate = { ...state.inputs, [id]: val };
+
+      // Run full validation
+      const errors = validateAll(candidate);
+
+      // Update UI for ALL fields
+      allFields.forEach(f => {
+        const input = $(`#${f}`);
+        if (input) {
+          input.classList.toggle('error', !!errors[f]);
+          input.toggleAttribute('aria-invalid', !!errors[f]);
+        }
+      });
+
+      // Update summary
       updateValidationSummary(errors);
-      
-      // Recalculate if no errors
+
+      // Always save current inputs (even if invalid)
+      setState({ inputs: candidate, errors });
+
+      // Only calculate if fully valid
       if (!hasErrors(errors)) {
         updateCalculations();
       }
     }, 300);
-    
-    listen(el, 'input', update);
-    listen(el, 'change', update);
+
+    listen(el, 'input', handler);
+    listen(el, 'change', handler);
+    listen(el, 'blur', handler);
   });
 }
 
 /* ---------- CALCULATIONS ---------- */
 function updateCalculations() {
-  const { D0, required, gConst, gShort, gLong, shortYears } = state.inputs;
-  const { errors } = state;
-  
-  // Don't calculate if there are validation errors
+  const { inputs, errors } = state;
   if (hasErrors(errors)) {
     setState({ calculations: null });
     return;
   }
-  
+
   try {
-    // Calculate all three models (convert percentages to decimals)
     const calculations = calculateAllModels({
-      D0,
-      required: required / 100,
-      gConst: gConst / 100,
-      gShort: gShort / 100,
-      gLong: gLong / 100,
-      shortYears
+      D0: inputs.D0,
+      required: inputs.required / 100,
+      gConst: inputs.gConst / 100,
+      gShort: inputs.gShort / 100,
+      gLong: inputs.gLong / 100,
+      shortYears: inputs.shortYears,
     });
-    
-    // Update state with calculations
     setState({ calculations });
-    
-  } catch (error) {
-    console.error('Calculation error:', error);
+  } catch (e) {
+    console.error(e);
     setState({ calculations: null });
   }
 }
