@@ -29,39 +29,39 @@
     <main class="content">
       <h1 class="sr-only">Dividend Discount Model Calculator</h1>
 
-      <!-- CARD 1 â€“ Equation -->
+      <!-- CARD 1 – Equation -->
       <section class="card" id="equation-card">
         <h2 class="card-title">Dividend Discount Models</h2>
         <p class="equation-intro">Three approaches to equity valuation</p>
 
         <div class="model-equations-grid">
           <!-- Constant Dividend Model -->
-          <div class="formula-box" style="border-left-color:#2563eb;">
+          <div class="formula-box" style="border-left-color:#3c6ae5;">
             <div class="formula-box-title">Constant Dividend Model</div>
             <div class="equation-container" tabindex="0" role="math"
                  aria-label="Price equals D zero divided by r">
               <div class="mathml-equation">
                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                   <mrow>
-                    <mi mathcolor="#2563eb" mathvariant="bold">P</mi>
+                    <mi mathcolor="#3c6ae5" mathvariant="bold">P</mi>
                     <mo>=</mo>
                     <mfrac>
-                      <msub><mi mathcolor="#92400e">D</mi><mn>0</mn></msub>
-                      <mi mathcolor="#6b21a8">r</mi>
+                      <msub><mi mathcolor="#b95b1d">D</mi><mn>0</mn></msub>
+                      <mi mathcolor="#733599">r</mi>
                     </mfrac>
                   </mrow>
                 </math>
               </div>
               <div class="html-equation" hidden>
-                <strong style="color:#2563eb;">P</strong> = 
-                <span style="color:#92400e;">D₀</span> ÷ 
-                <span style="color:#6b21a8;">r</span>
+                <strong style="color:#3c6ae5;">P</strong> = 
+                <span style="color:#b95b1d;">Dâ‚€</span> ÷ 
+                <span style="color:#733599;">r</span>
               </div>
             </div>
           </div>
 
           <!-- Constant Growth Model -->
-          <div class="formula-box" style="border-left-color:#16a34a;">
+          <div class="formula-box" style="border-left-color:#15803d;">
             <div class="formula-box-title">Constant Growth Model (Gordon)</div>
             <div class="equation-container" tabindex="0" role="math"
                  aria-label="Price equals D one divided by r minus g">
@@ -71,11 +71,11 @@
                     <mi mathcolor="#15803d" mathvariant="bold">P</mi>
                     <mo>=</mo>
                     <mfrac>
-                      <msub><mi mathcolor="#92400e">D</mi><mn>1</mn></msub>
+                      <msub><mi mathcolor="#b95b1d">D</mi><mn>1</mn></msub>
                       <mrow>
-                        <mi mathcolor="#6b21a8">r</mi>
-                        <mo>−</mo>
-                        <mi mathcolor="#c2410c">g</mi>
+                        <mi mathcolor="#733599">r</mi>
+                        <mo>âˆ’</mo>
+                        <mi mathcolor="#15803d">g</mi>
                       </mrow>
                     </mfrac>
                   </mrow>
@@ -83,28 +83,28 @@
               </div>
               <div class="html-equation" hidden>
                 <strong style="color:#15803d;">P</strong> = 
-                <span style="color:#92400e;">D₁</span> ÷ 
-                (<span style="color:#6b21a8;">r</span> − <span style="color:#c2410c;">g</span>)
+                <span style="color:#b95b1d;">Dâ‚</span> ÷ 
+                (<span style="color:#733599;">r</span> âˆ’ <span style="color:#15803d;">g</span>)
               </div>
             </div>
           </div>
 
           <!-- Changing Growth Model -->
-          <div class="formula-box" style="border-left-color:#9333ea;">
+          <div class="formula-box" style="border-left-color:#7a46ff;">
             <div class="formula-box-title">Changing Growth Model (Two-Stage)</div>
             <div class="equation-container" tabindex="0" role="math"
                  aria-label="Price equals present value of high growth dividends plus present value of terminal value">
               <div class="mathml-equation">
                 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
                   <mrow>
-                    <mi mathcolor="#9333ea" mathvariant="bold">P</mi>
+                    <mi mathcolor="#7a46ff" mathvariant="bold">P</mi>
                     <mo>=</mo>
                     <mtext style="font-size:0.9em;">PV(high) + PV(term)</mtext>
                   </mrow>
                 </math>
               </div>
               <div class="html-equation" hidden>
-                <strong style="color:#9333ea;">P</strong> = PV(high) + PV(term)
+                <strong style="color:#7a46ff;">P</strong> = PV(high) + PV(term)
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@
 
       <!-- MIDDLE ROW -->
       <div class="middle-row">
-        <!-- CARD 2 â€“ Results -->
+        <!-- CARD 2 – Results -->
         <section class="card" id="results-card" tabindex="-1" aria-labelledby="results-title">
           <h3 class="card-title" id="results-title">Valuations</h3>
           
@@ -121,7 +121,7 @@
           <div id="result-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         </section>
 
-        <!-- CARD 3 â€“ Visualization -->
+        <!-- CARD 3 – Visualization -->
         <section class="card" id="visualization-card" tabindex="-1" aria-labelledby="visualization-title">
           <h3 class="card-title" id="visualization-title">Dividend Cash Flows</h3>
           
@@ -144,7 +144,7 @@
         </section>
       </div>
 
-      <!-- CARD 4 â€“ Data Entry -->
+      <!-- CARD 4 – Data Entry -->
 <section class="card" id="data-entry" tabindex="-1" role="region" aria-labelledby="inputs-title">
   <h3 class="card-title" id="inputs-title">Data Entry</h3>
 
@@ -161,7 +161,7 @@
   <div class="input-grid">
     <!-- Current Dividend -->
      <div class="input-row">
-  <label for="D0">Current Dividend (D₀):</label>
+  <label for="D0">Current Dividend (Dâ‚€):</label>
   <div class="input-wrapper">
     <span class="input-prefix">$</span>
     <input type="number" id="D0" class="input-field-inline" min="0.01" max="1000" step="0.01" value="5"

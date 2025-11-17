@@ -1,23 +1,37 @@
 /* ==========================================================================
-   CFA Dividend Discount Calculator â€“ Clean & Accessible Styles
+   CFA Dividend Discount Calculator – Clean & Accessible Styles
    ========================================================================== */
 
 /* ==========================================================================
-   1. CSS VARIABLES â€“ Brand & Semantic Colors
+   1. CSS VARIABLES – WCAG AA Compliant Color Palette
    ========================================================================== */
 :root {
-  /* Brand Colors */
-  --color-primary: #4476ff;
-  --color-dark: #06005a;
-  --color-dark-alt: #38337b;
-  --color-blue: #2563eb;
-  --color-green: #16a34a;
-  --color-purple: #7b2bc5;
-  --color-yield: #7e22ce;
-  --color-mint: #49b2b8;
-  --color-orange: #b95b1d;
-  --color-orange-text: #c5611f;
-  --color-purchase: #f2af81;
+  /* Primary Data Colors - All meet WCAG AA (4.5:1 minimum) */
+  --color-primary-dark-blue: #06005a;    /* 18.18:1 - CFA Brand */
+  --color-blue-interactive: #3c6ae5;     /* 4.79:1 - Adjusted brand blue */
+  --color-secondary-dark-blue: #38337b;  /* 10.89:1 - CFA Brand */
+  --color-purple-bold: #7a46ff;          /* 5.06:1 - CFA Brand */
+  --color-eggplant-deep: #50037f;        /* 12.65:1 - CFA Brand */
+  --color-eggplant-medium: #733599;      /* 7.78:1 - CFA Brand */
+  --color-orange-deep: #b95b1d;          /* 4.59:1 - Adjusted brand orange */
+  --color-teal-data: #0079a6;            /* 4.90:1 - Adjusted brand cyan */
+  --color-green-data: #15803d;           /* 5.02:1 - Professional green */
+  --color-green-data-alt: #047857;       /* 5.48:1 - Alternative green */
+  
+  /* Dividend Calculator Specific Colors */
+  --color-dividend-constant: #3c6ae5;    /* Blue Interactive - Constant model */
+  --color-dividend-growth: #15803d;      /* Green Data - Growth model */
+  --color-dividend-changing: #7a46ff;    /* Purple Bold - Two-stage model */
+  --color-dividend-d: #b95b1d;           /* Orange Deep - Dividend value */
+  --color-dividend-r: #733599;           /* Eggplant Medium - Required return */
+  --color-dividend-g: #15803d;           /* Green Data - Growth rate */
+  
+  /* Background Colors - For result boxes (tested with dark text) */
+  --color-bg-blue: #eff6ff;              /* 13.49:1 with dark text */
+  --color-bg-purple: #faf5ff;            /* 13.68:1 with dark text */
+  --color-bg-orange: #fff7ed;            /* 13.83:1 with dark text */
+  --color-bg-green: #f0fdf4;             /* 14.02:1 with dark text */
+  --color-bg-teal: #f0fdfa;              /* 14.07:1 with dark text */
 
   /* Gray Scale */
   --color-gray-50: #f9fafb;
@@ -38,9 +52,22 @@
   --color-red-800: #991b1c;
 
   /* Model-Specific Colors */
-  --color-model-constant: #2563eb;
-  --color-model-growth: #16a34a;
-  --color-model-changing: #9333ea;
+  --color-model-constant: #3c6ae5;
+  --color-model-growth: #15803d;
+  --color-model-changing: #7a46ff;
+  
+  /* Legacy aliases for compatibility */
+  --color-primary: #3c6ae5;
+  --color-dark: #06005a;
+  --color-dark-alt: #38337b;
+  --color-blue: #3c6ae5;
+  --color-green: #15803d;
+  --color-purple: #7a46ff;
+  --color-yield: #733599;
+  --color-mint: #0079a6;
+  --color-orange: #b95b1d;
+  --color-orange-text: #b95b1d;
+  --color-purchase: #b95b1d;
 }
 
 /* ==========================================================================
@@ -157,7 +184,7 @@ body {
   gap: 1.5rem;
 }
 
-/* Middle Row â€“ Side-by-side on desktop */
+/* Middle Row – Side-by-side on desktop */
 .middle-row {
   display: flex;
   flex-direction: column;
@@ -277,7 +304,7 @@ body {
 }
 
 /* ==========================================================================
-   7. INPUTS â€“ Compact Inline Layout with Units
+   7. INPUTS – Compact Inline Layout with Units
    ========================================================================== */
 .input-section {
   display: flex;
@@ -367,7 +394,7 @@ body {
 .input-suffix-inline + .input-field-inline { padding-right: 1.5rem; }
 
 /* ==========================================================================
-   DATA ENTRY â€“ 3 PER ROW, COMPACT
+   DATA ENTRY – 3 PER ROW, COMPACT
    ========================================================================== */
 
 .input-grid {
@@ -504,7 +531,7 @@ body {
 .formula-box {
   border-left: 4px solid;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
+  background: #fff;
   border-radius: 0 0.5rem 0.5rem 0;
   min-height: 120px;
   display: flex;
@@ -796,7 +823,7 @@ body {
 }
 
 .validation-title::before {
-  content: "⚠";
+  content: "âš ";
   font-size: 1.25rem;
   line-height: 1;
 }
@@ -821,7 +848,7 @@ body {
 }
 
 .validation-summary li::before {
-  content: "•";
+  content: "â€¢";
   position: absolute;
   left: 0.5rem;
   font-weight: bold;
