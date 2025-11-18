@@ -1,5 +1,5 @@
 /**
- * validation.js â€“ Clean, cross-field aware validation
+ * validation.js – Clean, cross-field aware validation
  * Matches the pattern used in other calculators
  */
 import { $ } from './utils.js';
@@ -81,7 +81,7 @@ export function updateFieldError(fieldId, msg) {
   
   const hasError = !!msg;
   el.classList.toggle('error', hasError);
-  el.toggleAttribute('aria-invalid', hasError);
+  el.setAttribute('aria-invalid', hasError ? 'true' : 'false');
   
   // Add/remove aria-describedby for error message
   if (hasError) {

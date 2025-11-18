@@ -823,7 +823,7 @@ body {
 }
 
 .validation-title::before {
-  content: "âš ";
+  content: "⚠ ";
   font-size: 1.25rem;
   line-height: 1;
 }
@@ -848,7 +848,7 @@ body {
 }
 
 .validation-summary li::before {
-  content: "â€¢";
+  content: "•";
   position: absolute;
   left: 0.5rem;
   font-weight: bold;

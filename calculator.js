@@ -1,5 +1,5 @@
 /**
- * calculator.js â€“ Dividend Discount Model Calculator
+ * calculator.js – Dividend Discount Model Calculator
  */
 import { state, setState, subscribe } from './modules/state.js';
 import { calculateAllModels } from './modules/calculations.js';

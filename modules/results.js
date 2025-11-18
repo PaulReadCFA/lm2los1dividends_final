@@ -6,19 +6,19 @@ import { $ } from './utils.js';
 const MODEL_META = {
   constant: {
     name: 'Constant Dividend',
-    color: '#2563eb',
+    color: '#3c6ae5',
     description: 'No growth assumed',
     formula: 'P = D₀ ÷ r'
   },
   growth: {
     name: 'Constant Growth',
-    color: '#16a34a',
+    color: '#15803d',
     description: 'Constant growth rate',
-    formula: 'P = D₁ ÷ (r − g)'
+    formula: 'P = D₁ ÷ (r − g)'
   },
   changing: {
     name: 'Two-Stage Growth',
-    color: '#9333ea',
+    color: '#7a46ff',
     description: 'High then sustainable growth',
     formula: 'P = PV(high) + PV(term)'
   }

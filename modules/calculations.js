@@ -93,19 +93,19 @@ export function getModelMetadata(modelKey) {
   const metadata = {
     constant: {
       name: 'Constant Dividend Model',
-      color: '#2563eb',
+      color: '#3c6ae5',
       description: 'Assumes dividends remain constant forever',
       formula: 'P = D₀ ÷ r'
     },
     growth: {
       name: 'Constant Growth Model',
-      color: '#16a34a',
+      color: '#15803d',
       description: 'Assumes constant dividend growth rate forever',
       formula: 'P = D₁ ÷ (r − g)'
     },
     changing: {
       name: 'Changing Growth Model',
-      color: '#9333ea',
+      color: '#7a46ff',
       description: 'High growth initially, then sustainable growth forever',
       formula: 'P = PV(high growth) + PV(terminal)'
     }

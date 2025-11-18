@@ -5,9 +5,9 @@
 import { $ } from './utils.js';
 
 const MODEL_COLORS = {
-  constant: '#2563eb',
-  growth: '#16a34a',
-  changing: '#9333ea',
+  constant: '#3c6ae5',
+  growth: '#15803d',
+  changing: '#7a46ff',
   darkText: '#06005a'
 };
 
